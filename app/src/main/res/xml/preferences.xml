@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_syncTheme"
+        android:title="@string/pref_themes"
+        android:dialogTitle="@string/pref_select_theme"
+        android:entries="@array/pref_themes_entries"
+        android:entryValues="@array/pref_themes_entries"
+        android:defaultValue="@string/pref_theme_default" />
+
+    <ListPreference
+        android:key="pref_syncFont"
+        android:title="@string/pref_font"
+        android:dialogTitle="@string/pref_select_font"
+        android:entries="@array/pref_font_entries"
+        android:entryValues="@array/pref_font_entries"
+        android:defaultValue="@string/pref_font_default" />
+</PreferenceScreen>

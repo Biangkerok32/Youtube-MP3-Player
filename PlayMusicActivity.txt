@@ -1,0 +1,148 @@
+package com.example.daron.youtubemp3player;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
+public class PlayMusicActivity extends AppCompatActivity implements MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
+
+    final static String apiURL = "https://coolguruji-youtube-to-mp3-download-v1.p.mashape.com/?id=";
+    final static String apiKEY = "&mashape-key=8HhJIKEDxJmshduAQML89GLR1unqp1aHPugjsnTZ4pVf9CXtg9";
+    private MediaPlayer mediaPlayer;
+    private int mediaFileLength;
+    private int realTimeLength;
+    private ImageButton playPauseButton;
+    private SeekBar seekBar;
+    private TextView songProgress;
+    final Handler handler = new Handler();
+
+    @Override
+    public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
+        seekBar.setSecondaryProgress(i);
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        playPauseButton.setImageResource(R.drawable.ic_play);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_play_music);
+        Intent intent = getIntent();
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnBufferingUpdateListener(this);
+
+        final String urlText = intent.getStringExtra(AUDIO_SERVICE);
+        songProgress = (TextView) findViewById(R.id.songProgress);
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        seekBar.setMax(99); // (0-99)
+        seekBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mediaPlayer.isPlaying()) {
+                    SeekBar seekBar = (SeekBar) view;
+                    int playPosition = (mediaFileLength / 100) * seekBar.getProgress();
+                    mediaPlayer.seekTo(playPosition);
+                }
+                return false;
+            }
+        });
+        playPauseButton = (ImageButton) findViewById(R.id.playPause);
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                new FetchMP3Link().execute("http://mic.duytan.edu.vn:86/ncs.mp3");
+                new FetchMP3Link().execute("https://www.mp3converter.net/index.php?output=yt/38JwS2BqtXk/128%7e%7e256%7e%7e20_second_beat_uuid-5a9755ba71404.mp3");
+            }
+        });
+    }
+
+    private class FetchMP3Link extends AsyncTask<String, Void, String> {
+        final ProgressDialog progressDialog = new ProgressDialog(PlayMusicActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setMessage("Please wait");
+            progressDialog.show();
+        }
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            try {
+                URL url = new URL(apiURL + strings[0] + apiKEY);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                InputStream in = urlConnection.getInputStream();
+                if (in == null) {
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(in));
+                String mp3Link = "";
+
+                mediaPlayer.setDataSource(strings[0]);
+                mediaPlayer.prepare();
+
+
+            } catch (Exception e) {
+
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            mediaFileLength = mediaPlayer.getDuration();
+            realTimeLength = mediaFileLength;
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+                playPauseButton.setImageResource(R.drawable.ic_pause);
+            } else {
+                mediaPlayer.pause();
+                playPauseButton.setImageResource(R.drawable.ic_play);
+            }
+            updateSeekBar();
+            progressDialog.dismiss();
+        }
+
+    }
+
+    private void updateSeekBar() {
+        seekBar.setProgress((int) (((float) mediaPlayer.getCurrentPosition() / mediaFileLength) * 100));
+        if (mediaPlayer.isPlaying()) {
+            Runnable updater = new Runnable() {
+                @Override
+                public void run() {
+                    updateSeekBar();
+                    realTimeLength -= 1000; // declare 1 seconds
+                    songProgress.setText(String.format("%d:%d", TimeUnit.MILLISECONDS.toMinutes(realTimeLength),
+                            TimeUnit.MILLISECONDS.toSeconds(realTimeLength) - TimeUnit.MILLISECONDS.toMinutes(realTimeLength)));
+                }
+            };
+            handler.postDelayed(updater, 1000); // 1 second
+        }
+    }
+}
