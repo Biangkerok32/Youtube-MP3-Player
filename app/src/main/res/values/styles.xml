@@ -1,19 +1,11 @@
 <resources>
 
     <style name="Light" parent="ThemeOverlay.AppCompat.Light">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorAccent</item>
+        <item name="colorPrimary">@color/lightColorPrimary</item>
     </style>
 
-    <style name="Dark" parent="ThemeOverlay.AppCompat.Light">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorAccent</item>
+    <style name="Dark" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorPrimary">@color/darkColorPrimary</item>
     </style>
 
     <style name="FontCasual">

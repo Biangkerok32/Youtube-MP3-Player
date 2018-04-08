@@ -1,5 +1,6 @@
 package com.example.daron.youtubemp3player;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -53,5 +54,12 @@ public class SettingsActivity extends AppCompatActivity {
         } else if (font.equals("Cursive")) {
             this.setTheme(R.style.FontCursive);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

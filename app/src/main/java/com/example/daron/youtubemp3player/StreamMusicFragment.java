@@ -43,23 +43,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class StreamMusicFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        String link = urlView.getText().toString();
-        if (!link.equals("")) {
-            Log.e(LOG_TAG, link);
-            new UpdateLinkTask(getActivity()).execute(urlView.getText().toString());
-        }
-    }
+public class StreamMusicFragment extends Fragment implements View.OnClickListener, TextWatcher {
 
     private final String LOG_TAG = StreamMusicFragment.class.getSimpleName();
     final static String apiURL = "https://coolguruji-youtube-to-mp3-download-v1.p.mashape.com/?id=";
     final static String apiKEY = "&mashape-key=8HhJIKEDxJmshduAQML89GLR1unqp1aHPugjsnTZ4pVf9CXtg9";
     private EditText urlView;
     private ShareActionProvider shareActionProvider;
-    private CheckBox favorite;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,13 +61,34 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem shareItem = menu.findItem(R.id.action_share);
-
+        MenuItem favoriteItem = menu.findItem(R.id.action_favorite);
+        MenuItem showfavoritesItem = menu.findItem(R.id.action_display_favorites);
         // only show share if this fragment is visible
-        if (this.isVisible())
+        if (this.isVisible()) {
+            favoriteItem.setVisible(true);
             shareItem.setVisible(true);
+            showfavoritesItem.setVisible(true);
+        }
 
         shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
         setShareIntent("7a66clRobKI");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                Log.e(LOG_TAG, "triggered");
+                String link = urlView.getText().toString();
+                if (!link.equals("")) {
+                    Log.e(LOG_TAG, link);
+                    new UpdateLinkTask(getActivity()).execute(urlView.getText().toString());
+                }
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void setShareIntent(String text) {
@@ -93,31 +104,36 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
         if (container != null) {
             container.removeAllViews();
         }
+
+
         View view = inflater.inflate(R.layout.fragment_stream_music, container, false);
-        favorite = (CheckBox) view.findViewById(R.id.favorite);
-        favorite.setOnCheckedChangeListener(this);
         urlView = (EditText) view.findViewById(R.id.linkInput);
-        urlView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        urlView.addTextChangedListener(this);
 
-            }
+        if (getArguments() != null) {
+            Bundle bundle = getArguments();
+            String link = bundle.getString("link");
+            urlView.setText(link);
+        }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (shareActionProvider != null) {
-                    setShareIntent(s.toString());
-                }
-            }
-        });
         Button playMusic = (Button) view.findViewById(R.id.playMusic);
         playMusic.setOnClickListener(this);
         return view;
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (shareActionProvider != null) {
+            setShareIntent(s.toString());
+        }
     }
 
     @Override
@@ -139,7 +155,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
     public void loadWebPage(String url) {
         Log.e(LOG_TAG, "Loading webpage");
         final WebView webview = new WebView(getContext());
-
         webview.getSettings().setJavaScriptEnabled(true);
         webview.addJavascriptInterface(this, "android");
         webview.setWebViewClient(new WebViewClient() {
@@ -239,7 +254,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
         return downloadLinkJSONObj.getString("html");
     }
 
-    //Inner class to update the drink.
     private class UpdateLinkTask extends AsyncTask<String, Void, Boolean> {
         private ContentValues linkValues;
         Activity activity;
@@ -249,10 +263,8 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
         }
 
         protected void onPreExecute() {
-            CheckBox favorite = (CheckBox) activity.findViewById(R.id.favorite);
             linkValues = new ContentValues();
-            linkValues.put("FAVORITE", favorite.isChecked());
-            Log.e(LOG_TAG, Boolean.toString(favorite.isChecked()));
+            linkValues.put("FAVORITE", true);
         }
 
         protected Boolean doInBackground(String... links) {

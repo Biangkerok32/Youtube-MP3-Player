@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
         setApplicationFont(font);
         setContentView(R.layout.activity_main);
 
-
         // If it is normal potrait layout, add the list fragment otherwise
         if (findViewById(R.id.portrait_layout) != null) {
 
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
             this.setTheme(R.style.Dark);
         }
     }
+
     public void setApplicationFont(String font) {
         if (font.equals("Casual")) {
             this.setTheme(R.style.FontCasual);
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
                 ft.addToBackStack(null);
                 ft.commit();
             }
-        }else{
+        } else {
             FavoritesFragment favoritesFragment = new FavoritesFragment();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             // update screen for portrait layout otherwise update for landscape and large
@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.actionbar_menu, menu);
         menu.findItem(R.id.action_share).setVisible(false);
+        menu.findItem(R.id.action_favorite).setVisible(false);
+        menu.findItem(R.id.action_display_favorites).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -117,19 +119,23 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
                 startActivity(intent);
                 return true;
 
-            case R.id.action_favorite:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
-                return true;
             case R.id.action_display_favorites:
+                FavoritesFragment favoritesFragment = new FavoritesFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                if (findViewById(R.id.portrait_layout) != null) {
+                    ft.replace(R.id.fragment_container, favoritesFragment);
+                    ft.addToBackStack(null);
+                    ft.commit();
+                } else {
+                    ft.replace(R.id.stream_fragment_container, favoritesFragment);
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
                 return true;
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
     }
-
-
 }
