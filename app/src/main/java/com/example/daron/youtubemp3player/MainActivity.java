@@ -5,12 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
-
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -28,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements ActionListFragmen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = sharedPreferences.getString(SettingsFragment.THEME_KEY, "Light");
         String font = sharedPreferences.getString(SettingsFragment.FONT_KEY, "Casual");
-        Log.e(LOG_TAG, theme);
         setApplicationTheme(theme);
         setApplicationFont(font);
         setContentView(R.layout.activity_main);

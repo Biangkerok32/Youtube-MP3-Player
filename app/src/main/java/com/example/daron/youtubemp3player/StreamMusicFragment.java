@@ -27,8 +27,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -78,10 +76,8 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_favorite:
-                Log.e(LOG_TAG, "triggered");
                 String link = urlView.getText().toString();
                 if (!link.equals("")) {
-                    Log.e(LOG_TAG, link);
                     new UpdateLinkTask(getActivity()).execute(urlView.getText().toString());
                 }
                 return true;
@@ -140,7 +136,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         String defaultURL = "7a66clRobKI";
         String urlText = urlView.getText().toString();
-        Log.e(LOG_TAG, "Button pressed");
         Toast.makeText(getContext(), "Song will start shortly", Toast.LENGTH_SHORT).show();
         int id = v.getId();
         if (id == R.id.playMusic) {
@@ -153,7 +148,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
     }
 
     public void loadWebPage(String url) {
-        Log.e(LOG_TAG, "Loading webpage");
         final WebView webview = new WebView(getContext());
         webview.getSettings().setJavaScriptEnabled(true);
         webview.addJavascriptInterface(this, "android");
@@ -169,9 +163,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
 
     @JavascriptInterface
     public void onData(String link) throws IOException {
-        Log.e(LOG_TAG, "Loaded webpage");
-        Log.e(LOG_TAG, link);
-
         PlayerFragment playerFragment = new PlayerFragment();
         playerFragment.loadMedia(link, getContext());
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
@@ -207,7 +198,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
                 String downloadLinkJsonString = getJsonStringFromBuffer(reader);
                 downloadLink = getDownloadLink(downloadLinkJsonString);
 
-                Log.e(LOG_TAG, downloadLink);
             } catch (Exception e) {
                 Log.e(LOG_TAG + "Error", e.getMessage());
             } finally {
@@ -228,7 +218,7 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result != null)
-                Log.e(LOG_TAG, result);
+                Log.i(LOG_TAG, result);
 
             loadWebPage(result);
         }
@@ -270,7 +260,6 @@ public class StreamMusicFragment extends Fragment implements View.OnClickListene
         protected Boolean doInBackground(String... links) {
             linkValues.put("NAME", links[0]);
             SQLiteOpenHelper databaseHelper = new DatabaseHelper(activity);
-            Log.e(LOG_TAG, links[0]);
             try {
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.insert("LINKS", null, linkValues);

@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 public class SettingsActivity extends AppCompatActivity {
     private final String LOG_TAG = SettingsActivity.class.getSimpleName();
@@ -19,7 +18,6 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = sharedPreferences.getString(SettingsFragment.THEME_KEY, "Light");
         String font = sharedPreferences.getString(SettingsFragment.FONT_KEY, "Casual");
-        Log.e(LOG_TAG, theme);
         setApplicationTheme(theme);
         setApplicationFont(font);
         setContentView(R.layout.activity_settings);

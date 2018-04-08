@@ -2,13 +2,9 @@ package com.example.daron.youtubemp3player;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.MediaController;
 
 
